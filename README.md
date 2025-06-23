@@ -42,28 +42,26 @@ Chiusura con “×” in alto a destra.
 ## Tecnologia usata
 Il progetto è stato realizzato utilizzando HTML per la struttura dei contenuti, CSS per definire lo stile dell’interfaccia e garantire un design pulito e responsive, e JavaScript per gestire l’interattività: dal filtro orario alle griglie dinamiche fino al lightbox di dettaglio.
 
-Un esempio di come viene sfruttata la potenza delle WebGL texture per caricare le anteprime in modo efficiente:
+JavaScript
 
-const image = new Image();
-image.onload = () => {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(
-        gl.TEXTURE_2D,
-        level,
-        internalFormat,
-        srcFormat,
-        srcType,
-        image
-    );
-    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-        gl.generateMipmap(gl.TEXTURE_2D);
-    } else {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    }
-};
-image.src = url;
+// Apertura del lightbox quando clicco su una miniatura
+const lightbox = document.getElementById('lightbox');
+const lbImage  = lightbox.querySelector('img');
+
+document.querySelectorAll('.photo').forEach(photo => {
+  photo.addEventListener('click', () => {
+    lbImage.src = photo.src;      // carica l'immagine selezionata
+    lightbox.style.display = 'flex'; // mostra il lightbox
+  });
+});
+
+// Chiusura se clicco sullo sfondo del lightbox
+lightbox.addEventListener('click', e => {
+  if (e.target === lightbox) {
+    lightbox.style.display = 'none';
+  }
+});
+
 
 
 ## Target e contesto d’uso
