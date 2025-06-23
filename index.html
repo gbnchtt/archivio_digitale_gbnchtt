@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>archivio digitale gbnchtt</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 100px; /* 60px header + 40px spazio */
+        }
+
+        body, html {
+            overflow-x: hidden;
+            overflow-y: hidden; /* Blocca lo scroll verticale */
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 60px;
+            z-index: 1000;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            padding-right: 20px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            text-align: left;      /* Aggiungi questa riga */
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            margin: 0;
+            line-height: 1.4;
+            color: #000;
+        }
+
+        .wrapper {
+            position: relative;
+            width: 100vw;
+            display: flex;
+            justify-content: center;      /* Cambia da flex-start a center */
+            align-items: flex-start;
+            padding: 0;
+            padding-left: 0;              /* Togli padding-left */
+            margin-bottom: 36px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 10px; /* Reduced from 20px to 10px */
+        }
+
+        .main-title {
+            font-size: 16px;
+            font-weight: normal;
+            margin-bottom: 5px; /* Reduced from 10px to 5px */
+        }
+
+        .subtitle {
+            font-size: 16px; /* Changed from 14px to match main-title */
+            font-weight: normal;
+            color: #000000;
+            margin-top: 0; /* Added to remove any default margin */
+        }
+
+        .images-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            gap: 18px;
+            justify-content: flex-start;
+            align-items: flex-end;
+            width: 100%;
+            overflow-x: visible;
+            padding: 0;
+            padding-left: 20px; /* uguale a header e intro */
+            margin-bottom: 0;
+        }
+
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0);
+            animation: scaleUp calc(var(--scale-ratio) * 1s) forwards;
+            animation-delay: calc(var(--index) * 0.2s);
+            transition: all 0.3s ease;
+            width: 90px !important;   /* dimensione ridotta */
+            min-width: 90px !important;
+            max-width: 90px !important;
+        }
+
+        .image-container:hover .image-wrapper img,
+        .image-container.active .image-wrapper img {
+            opacity: 0.8;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .count-number {
+            font-size: 12px;
+            margin: 6px 0;
+            transition: color 0.3s ease;
+        }
+
+        .image-container:hover .count-number,
+        .image-container.active .count-number {
+            color: #87A989; /* Sage green color */
+        }
+
+        @keyframes scaleUp {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .explore-button {
+            margin-top: -10px; /* Negative margin to pull it up further */
+            padding: 12px 24px;
+            font-size: 16px;
+            background: none;
+            border: none;
+            color: #000;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            animation-delay: 2s;
+            cursor: pointer; /* Keep the cursor as pointer */
+            pointer-events: auto; /* Changed from none to auto to enable hover */
+        }
+
+        .explore-button:hover {
+            background: none; /* Removed background */
+            color: #87A989; /* Changed to sage green on hover */
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Replace the gallery related styles with these */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px; /* Single uniform value for all spacing */
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px; /* Match the gap size */
+            box-sizing: border-box;
+        }
+
+        .gallery-overlay {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 0; /* Remove padding from overlay */
+            box-sizing: border-box;
+        }
+
+        .gallery-image-wrapper {
+            padding-bottom: 100%; /* Force square aspect ratio */
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .gallery-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block; /* Remove inline-block spacing */
+        }
+
+        /* Remove any margins from parent containers */
+        #main {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent any scrollbar issues */
+        }
+
+        .subtitle-gray {
+            color: #000000;
+        }
+
+        .intro {
+            text-align: center;
+            padding: 20px;
+            margin-top: 0px; /* Diminuito da 60px a 36px */
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- Qui puoi mettere solo il logo o lasciare vuoto -->
+    </div>
+    <div class="intro">
+        <h1 class="title">
+            <span style="font-size:20px;">archivio digitale gbnchtt</span><br>
+            in questo archivio digitale trovi le categorie di immagini che scatto con maggiore frequenza.<br>
+            <span class="subtitle-gray">clicca una categoria per esplorare le mie foto</span>
+        </h1>
+    </div>
+    <div class="wrapper">
+        <div class="images-wrapper" id="container_animals_row1"></div>
+    </div>
+    <div class="wrapper">
+        <div class="images-wrapper" id="container_animals_row2"></div>
+    </div>
+
+    <script>
+        function goToArchive() {
+            window.location.href = 'archive.html';
+        }
+
+        const categories = [
+            {"category": "fiori", "count": 70},
+            {"category": "tramonto", "count": 376},
+            {"category": "party", "count": 356},
+            {"category": "mare", "count": 375},
+            {"category": "animali", "count": 785},
+            {"category": "cibo", "count": 473},
+            {"category": "lago", "count": 186},
+            {"category": "architettura", "count": 1204},
+            {"category": "arte", "count": 398},           // <--- aggiungi questa riga
+            {"category": "altro", "count": 202},
+            {"category": "random people", "count": 452},
+            {"category": "luna", "count": 192}
+            
+
+
+
+
+        ];
+
+        window.onload = function() {
+            const container1 = document.getElementById('container_animals_row1');
+            const container2 = document.getElementById('container_animals_row2');
+            container1.innerHTML = '';
+            container2.innerHTML = '';
+            init(); // Just initialize the categories grid
+        };
+
+        function init() {
+            const row1 = document.getElementById('container_animals_row1');
+            const row2 = document.getElementById('container_animals_row2');
+            row1.innerHTML = '';
+            row2.innerHTML = '';
+
+            // Ordina le categorie in modo decrescente per numero di immagini
+            const sortedCategories = categories.slice().sort((a, b) => b.count - a.count);
+            const maxCount = Math.max(...categories.map(cat => cat.count));
+            const minCount = Math.min(...categories.map(cat => cat.count));
+
+            // Get current category from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeCategory = urlParams.get('category');
+
+            sortedCategories.forEach((cat, index) => {
+                const baseSize = 220;
+                const scaleRatio = 0.5 + ((cat.count - minCount) / (maxCount - minCount)) * 0.5;
+                const size = baseSize * scaleRatio;
+
+                const div = document.createElement('div');
+                div.className = 'image-container';
+
+                if (cat.category === activeCategory) {
+                    div.classList.add('active');
+                }
+                div.style.width = `${size}px`;
+                div.style.setProperty('--scale-ratio', scaleRatio);
+                div.style.setProperty('--index', index);
+                div.style.cursor = 'pointer';
+
+                const count = document.createElement('div');
+                count.className = 'count-number';
+                count.textContent = `${cat.count}`;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'image-wrapper';
+                const img = document.createElement('img');
+                img.src = `./images/${cat.category}/${
+                    cat.category === 'cibo' ? 'IMG_287' : 
+                    cat.category === 'lago' ? 'IMG_32' : 
+                    cat.category === 'mare' ? 'IMG_29' :
+                    cat.category === 'party' ? 'IMG_24' :
+                    cat.category === 'tramonto' ? 'IMG_14' :
+                    cat.category === 'architettura' ? 'IMG_361' :
+                    cat.category === 'arte' ? 'IMG_257' :
+                    cat.category === 'altro' ? 'IMG_173' :
+                    cat.category === 'random people' ? 'IMG_151' :
+                    cat.category === 'luna' ? 'IMG_60' :
+                    cat.category === 'animali' ? 'IMG_248' :
+                    cat.category === 'fiori' ? 'IMG_29' :
+                    'IMG_0'
+                }.jpeg`;
+
+                wrapper.appendChild(img);
+                div.appendChild(count);
+                div.appendChild(wrapper);
+
+                div.onclick = () => {
+                    document.querySelectorAll('.image-container').forEach(container => {
+                        container.classList.remove('active');
+                    });
+                    div.classList.add('active');
+                    window.location.href = `archive.html?category=${cat.category}`;
+                };
+
+                // Prima riga: index 0-5, seconda riga: index 6-11
+                if (index < 6) {
+                    row1.appendChild(div);
+                } else {
+                    row2.appendChild(div);
+                }
+            });
+        }
+
+        // Remove the DOMContentLoaded listener and use window.onload instead
+        // document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
