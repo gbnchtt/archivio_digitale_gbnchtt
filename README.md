@@ -6,7 +6,7 @@ Elaborato 1: Me, Myself & AI
 
 # archivio digitale gbnchtt
 Autore: Giorgia Bianchetti 
-[archivio digitale gbnchtt] <br> (https://gbnchtt.github.io/archivio_digitale_gbnchtt/)
+[archivio digitale gbnchtt](https://gbnchtt.github.io/archivio_digitale_gbnchtt/)
 
 
 ## Introduzione e tema
@@ -67,6 +67,5 @@ image.src = url;
 
 
 ## Target e contesto d’uso
-Sed enim ut sem viverra aliquet eget sit. Iaculis at erat pellentesque adipiscing commodo. Et pharetra pharetra massa massa ultricies mi quis hendrerit dolor. At tempor commodo ullamcorper a lacus vestibulum sed arcu. Ipsum faucibus vitae aliquet nec ullamcorper sit. Tempus quam pellentesque nec nam aliquam sem et tortor. Turpis egestas sed tempus urna et pharetra pharetra massa. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc vel.
-
-[<img src="doc/munari.jpg" width="300" alt="Supplemento al dizionario italiano">]()
+Il progetto si rivolge principalmente a designer, fotografi e professionisti creativi che vogliono esplorare il proprio archivio visivo per trarre ispirazione e individuare nuovi spunti estetici. Grazie a un’interfaccia minimale e pulita, è possibile navigare rapidamente tra categorie come architettura, animali, cibo e mare, scoprendo quali soggetti ricorrono più spesso e in quali orari del giorno vengono immortalati.
+Inoltre, l’analisi temporale delle fotografie offre una prospettiva sull’evoluzione dei propri interessi fotografici e sui pattern di produzione visiva.
