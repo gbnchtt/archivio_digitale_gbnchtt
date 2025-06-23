@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>archivio digitale gbnchtt</title>  <!-- Changed from "HTML5 Boilerplate" -->
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .header {
+        position: fixed;
+        top: 14px;           /* Sposta la testata in basso */
+        left: 0;
+        width: 100vw;
+        height: 60px;
+        z-index: 2000;
+        background: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-top: 0;       /* Elimina il margine! */
+        margin-bottom: 0;
+        box-sizing: border-box;
+    }
+
+    .header-left,
+    .header-right {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .header-left {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: normal;
+    }
+
+    .orario-link {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #000;
+        cursor: pointer;
+        user-select: none;
+        background: none;
+        border: none;
+        padding: 0 2px 2px 2px; /* padding orizzontale e un po' sotto per il filetto */
+        outline: none;
+        font-weight: normal;
+        vertical-align: middle;
+        border-top: 1px solid #eee;      /* filetto sopra */
+        border-bottom: 1px solid #eee;   /* filetto sotto */
+        border-radius: 0; /* nessun bordo arrotondato */
+        transition: border-color 0.2s;
+    }
+    .orario-link:hover {
+        color: #87A989; /* verde salvia */
+        /* Rimuovi queste due righe: */
+        /* border-top: 1px solid #87A989; */
+        /* border-bottom: 1px solid #87A989; */
+    }
+    
+    .category-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 20px 8px 0;
+        cursor: pointer;
+        opacity: 1; /* Ensure visibility */
+        visibility: visible;
+    }
+
+    .category-item:hover .category-title,
+    .category-item:hover .count-number {
+        color: #87A989; /* Changed from #808080 to sage green */
+    }
+
+    .category-item.active .category-title,
+    .category-item.active .count-number {
+        color: #87A989; /* Same color as hover */
+    }
+
+    .category-title {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #000;
+        text-transform: lowercase;
+        letter-spacing: 0.5px;
+    }
+
+    .count-number {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #000;
+    }
+
+    #main {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        width: 100%;
+        height: calc(100vh - 100px);
+        padding-top: 90px; /* era 110px */
+    }
+
+    .glitch-text {
+        position: relative;
+        display: inline-block;
+    }
+
+    .glitch-animation {
+        animation: glitch 4s steps(100) forwards;
+    }
+
+    @keyframes glitch {
+        0% {
+            filter: blur(2px);
+            transform: skew(2deg);
+        }
+        20% {
+            filter: blur(1px);
+            transform: skew(-2deg);
+        }
+        40% {
+            filter: blur(0.5px);
+            transform: skew(1deg);
+        }
+        60% {
+            filter: blur(0.3px);
+            transform: skew(-1deg);
+        }
+        80% {
+            filter: blur(0.1px);
+            transform: skew(0.5deg);
+        }
+        100% {
+            filter: none;
+            transform: none;
+        }
+    }
+
+    .mini-grid {
+        position: absolute;
+        top: 24px; /* Account for count-number height + margin (18px + 6px) */
+        left: 0;
+        width: 100%;
+        height: calc(100% - 48px); /* Subtract space for both texts (24px top + 24px bottom) */
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 0;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background: white;
+        z-index: 2;
+    }
+
+    .mini-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Remove duplicate .mini-grid definition */
+
+    .glitches-container {
+        position: fixed;
+        top: 160px; /* Increased from 100px to 160px to move galleries down */
+        right: 0;
+        width: 300px;
+        height: calc(100vh - 160px); /* Adjusted to match new top position */
+        overflow-y: auto; /* Changed from visible to auto */
+        background: white;
+        z-index: 1000;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .gallery-overlay {
+        position: relative;
+        margin-left: 300px; /* spazio per categorie */
+        margin-right: 20px;
+        width: calc(100% - 320px);
+        background: white;
+        z-index: 1000;
+        padding: 0;
+        margin-top: 0;
+    }
+
+    .gallery-row {
+        display: flex;
+        gap: 4px;
+        padding: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .gallery-row.horizontal-view {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: 100px;
+    }
+
+    .gallery-row.grid-view {
+        flex-wrap: wrap;
+        height: auto; /* Changed from fixed height */
+        overflow: visible; /* Removed scrolling from container */
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(24, 1fr); /* 24 photos per row */
+        gap: 0; /* Remove gaps between images */
+        padding: 0; /* Remove padding */
+        margin: 0; /* Remove top margin */
+        width: 100%;
+    }
+
+    .gallery-image-wrapper {
+        width: 100%;
+        aspect-ratio: 3/4; /* Changed from 1 to 3/4 for vertical 4:3 ratio */
+        overflow: hidden;
+        position: relative;
+    }
+
+    .gallery-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        cursor: pointer;
+        /* Rimuovi transition e transform */
+    }
+
+    .gallery-image:hover {
+        filter: brightness(0.7);
+    }
+
+    /* Add these styles to your existing CSS */
+    .lightbox {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(255,255,255,0.98);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+    }
+
+    .lightbox.active {
+        display: flex;
+    }
+
+    .lightbox-image {
+        max-width: 80vw;
+        max-height: 80vh;
+        object-fit: contain;
+    }
+
+    .close-lightbox {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 32px;
+        color: #000;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 3001;
+    }
+
+    .nav-button {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #000;
+        cursor: pointer;
+        padding: 20px;
+        z-index: 3001;
+    }
+
+    .nav-button.prev {
+        left: 20px;
+    }
+
+    .nav-button.next {
+        right: 20px;
+    }
+
+    .nav-button:hover {
+        opacity: 0.7;
+    }
+
+   .total-count {
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 8px;
+    color: #333;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: static;
+    padding: 0;
+    background: white;
+    z-index: 1001;
+    text-align: left;
+}
+
+
+
+    
+
+    .time-header {
+        position: fixed;
+        top: 64px; /* era 60px, ora 60+14=74px */
+        left: 300px;
+        right: 20px;
+        height: 30px;
+        z-index: 2500; /* aumenta il valore! */
+        background: #fff;
+    }
+
+    .hour-marker {
+        flex: 1;
+        text-align: center;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 11px;
+        color: #666;
+        padding: 8px 0;
+        border-right: 1px solid #eee;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .hour-marker:hover,
+    .hour-marker.active {
+        background-color: rgba(135, 169, 137, 0.5); /* verde salvia con opacità 50% */
+        color: #fff;
+    }
+
+ .categories-wrapper {
+  position: fixed;
+  top: 94px; /* era 80px, ora 80+14=94px */
+  left: 0;
+  width: 300px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  width: 300px;
+  flex: 0 0 300px;
+  box-sizing: border-box;
+  max-height: calc(100vh - 100px); /* = finestra meno header */
+  overflow-y: auto;                /* scroll interno */
+}
+
+.totale-immagini {
+    font-size: 14px;
+    color: #888888;
+    margin-top: 6px;
+    text-align: left;
+}
+.header > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: fi
+}
+
+.top-white-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 14px;      /* uguale al top della .header */
+    background: #fff;
+    z-index: 2100;     /* più alto della .header */
+    pointer-events: none; /* così non blocca i click */
+}
+    
+    </style>
+</head>
+
+<body>
+    <div class="top-white-bar"></div>
+    <div class="header">
+        <div class="header-left">
+            <h1 style="margin:0;">
+                <a href="index.html" style="text-decoration: none; color: #000">archivio digitale gbnchtt</a>
+            </h1>
+            <div id="totale-immagini" class="totale-immagini"></div>
+        </div>
+        <div class="header-right">
+            <span id="toggle-timeline" class="orario-link">orario</span>
+            <span id="orario-tooltip" style="display:none; margin-left:12px; font-size:13px; color:#87A989; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                clicca su un orario e scopri quali foto ho scattato a quell'ora
+            </span>
+        </div>
+    </div>
+
+    <div id="main"> 
+        <div id="container_animals" class="categories-wrapper">
+            <div class="category-item" data-category="architettura">
+                <span class="category-title">Architettura</span>
+                <span class="count-number">790</span>
+            </div>
+            <div class="category-item" data-category="animali">
+                <span class="category-title">Animali</span>
+                <span class="count-number">785</span>
+            </div>
+            <div class="category-item" data-category="cibo">
+                <span class="category-title">Cibo</span>
+                <span class="count-number">473</span>
+            </div>
+            <div class="category-item" data-category="random people">
+                <span class="category-title">Random People</span>
+                <span class="count-number">485</span>
+            </div>
+            <div class="category-item" data-category="tramonto">
+                <span class="category-title">Tramonto</span>
+                <span class="count-number">375</span>
+            </div>
+            <div class="category-item" data-category="mare">
+                <span class="category-title">Mare</span>
+                <span class="count-number">375</span>
+            </div>
+            <div class="category-item" data-category="party">
+                <span class="category-title">Party</span>
+                <span class="count-number">356</span>
+            </div>
+            <div class="category-item" data-category="altro">
+                <span class="category-title">Altro</span>
+                <span class="count-number">197</span> <!-- Cambia da 202 a 197 -->
+            </div>
+            <div class="category-item" data-category="luna">
+                <span class="category-title">Luna</span>
+                <span class="count-number">172</span>
+            </div>
+            <div class="category-item" data-category="lago">
+                <span class="category-title">Lago</span>
+                <span class="count-number">186</span>
+            </div>
+            <div class="category-item" data-category="fiori">
+                <span class="category-title">Fiori</span>
+                <span class="count-number">70</span>
+            </div>
+            <div class="category-item" data-category="arte">
+                <span class="category-title">Arte</span>
+                <span class="count-number">398</span> <!-- Aggiorna il numero con il totale corretto -->
+            </div>
+        </div>
+    </div>
+  
+    <!-- Aggiungi questo prima del tuo script principale -->
+    <script src="metadata.js"></script>
+    <!-- <script src="script.js"></script> -->
+    <script>
+    // Initialize category-specific data
+let currentData = null;
+let currentCategory = null;
+
+const categoryMapping = {
+    'architettura': 'architettura',
+    'animali': 'foto',    // Changed from 'foto' to 'animali'
+    'cibo': 'cibo',
+    'random people': 'random people',
+    'tramonto': 'tramonto',
+    'mare': 'mare',
+    'party': 'party',
+    'altro': 'altro',
+    'luna': 'luna',
+    'lago': 'lago',
+    'fiori': 'fiori',
+    'arte': 'arte',
+};
+
+// async function loadCategoryData(category) {
+//     try {
+//         console.log('Loading category:', category); // Debug log
+//         const response = await fetch('tutti_animali.json');
+//         const json = await response.json();
+//         console.log('JSON data:', json); // Debug log
+        
+//         if (categoryMapping[category]) {
+//             currentData = json[categoryMapping[category]];
+//             console.log('Loaded data:', currentData?.length || 0); // Debug log
+//             currentCategory = category;
+//             return true;
+//         }
+//         return false;
+//     } catch (error) {
+//         console.error(`Error loading ${category} data:`, error);
+//         return false;
+//     }
+// }
+
+// function setupCategoryListeners() {
+//     const categoryItems = document.querySelectorAll('.category-item');
+//     categoryItems.forEach(item => {
+//         item.addEventListener('click', async function() {
+//             const newCategory = this.getAttribute('data-category');
+            
+//             // Update UI
+//             categoryItems.forEach(cat => cat.classList.remove('active'));
+//             this.classList.add('active');
+            
+//             // Clear existing displays
+//             const existingGallery = document.querySelector('.gallery-overlay');
+//             if (existingGallery) {
+//                 existingGallery.remove();
+//             }
+            
+//             // Clear timeline selection
+//             const activeHour = document.querySelector('.hour-marker.active');
+//             if (activeHour) {
+//                 activeHour.classList.remove('active');
+//             }
+
+//             // Enable timeline and load category data
+//             document.querySelectorAll('.hour-marker').forEach(m => {
+//                 m.style.pointerEvents = 'auto';
+//                 m.style.opacity = '1';
+//             });
+
+//             // Load data for the new category
+//             await loadCategoryData(newCategory);
+//         });
+//     });
+// }
+
+// Add after setupTimelineListeners function
+// function displayImages(images, hour, category) {
+//     const mainContainer = document.querySelector('#main');
+//     const existingGallery = document.querySelector('.gallery-overlay');
+    
+//     // Remove existing gallery if present
+//     if (existingGallery) {
+//         existingGallery.remove();
+//     }
+    
+//     // Create new gallery container
+//     const galleryOverlay = document.createElement('div');
+//     galleryOverlay.className = 'gallery-overlay';
+    
+//     // Add count display
+//     const countDiv = document.createElement('div');
+//     countDiv.className = 'total-count';
+//     countDiv.textContent = `${images.length} foto di ${category} scattate alle ${hour}:00`;
+//     galleryOverlay.appendChild(countDiv);
+    
+//     if (images.length === 0) {
+//         // Display message if no images found
+//         const noImages = document.createElement('div');
+//         noImages.className = 'no-images';
+//         noImages.textContent = `Nessuna foto di ${category} scattata alle ${hour}:00`;
+//         galleryOverlay.appendChild(noImages);
+//     } else {
+//         // Create grid for images
+//         const grid = document.createElement('div');
+//         grid.className = 'gallery-grid';
+        
+//         // Add images to grid
+//         images.forEach img => {
+//             const wrapper = document.createElement('div');
+//             wrapper.className = 'gallery-image-wrapper';
+            
+//             const imgElement = document.createElement('img');
+//             imgElement.src = `images/${category}/${img.filename}`;
+//             imgElement.className = 'gallery-image';
+//             imgElement.alt = `Foto di ${category} scattata alle ${hour}:00`;
+            
+//             wrapper.appendChild(imgElement);
+//             grid.appendChild(wrapper);
+//         });
+        
+//         galleryOverlay.appendChild(grid);
+//     }
+    
+//     mainContainer.appendChild(galleryOverlay);
+// }
+
+// Initialize on page load
+// document.addEventListener('DOMContentLoaded', async function() {
+//     await loadCategoryData('animali');
+//     setupCategoryListeners();
+// });
+
+function setupGallery() {
+    // Get all category items
+    const categoryItems = document.querySelectorAll('.category-item');
+    
+    // Check URL parameters for category
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedCategory = urlParams.get('category');
+    
+    // Add click handler to each category
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+            selectCategory(this.getAttribute('data-category'));
+        });
+        
+        // If this is the selected category from URL, activate it
+        if (selectedCategory && item.getAttribute('data-category') === selectedCategory) {
+            selectCategory(selectedCategory);
+        }
+    });
+}
+
+function selectCategory(category) {
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(cat => cat.classList.remove('active'));
+
+    // Rimuovi la selezione dagli orari
+    document.querySelectorAll('.hour-marker.active').forEach(marker => marker.classList.remove('active'));
+
+    const selectedItem = document.querySelector(`[data-category="${category}"]`);
+    if (selectedItem) {
+        selectedItem.classList.add('active');
+        // Mostra tutte le immagini della categoria
+        displayCategoryImages(category);
+    }
+}
+
+function displayCategoryImages(category) {
+    const existingGallery = document.querySelector('.gallery-overlay');
+    if (existingGallery) {
+        existingGallery.remove();
+    }
+    
+    // Create gallery container
+    const galleryOverlay = document.createElement('div');
+    galleryOverlay.className = 'gallery-overlay';
+    
+    // Create grid
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+    
+    // Get number of images from the category count
+    const categoryElement = document.querySelector(`[data-category="${category}"] .count-number`);
+    const imageCount = parseInt(categoryElement.textContent);
+    
+    // Add all images to grid
+    for (let i = 0; i < imageCount; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'gallery-image-wrapper';
+        
+        const imgElement = document.createElement('img');
+        imgElement.src = `images/${category}/IMG_${i}.jpeg`;
+        imgElement.className = 'gallery-image';
+        
+        // Add click handler for lightbox
+        imgElement.addEventListener('click', () => {
+            openLightbox(imgElement.src, category);
+        });
+        
+        wrapper.appendChild(imgElement);
+        grid.appendChild(wrapper);
+    }
+    
+    galleryOverlay.appendChild(grid);
+    document.querySelector('#main').appendChild(galleryOverlay);
+}
+
+function createTimeline() {
+    const timeHeader = document.createElement('div');
+    timeHeader.className = 'time-header';
+    timeHeader.id = 'timeline_bar'; // <-- usa il trattino, non l'underscore!
+
+    // Create 24 hour markers
+    for (let i = 0; i < 24; i++) {
+        const hourMarker = document.createElement('div');
+        hourMarker.className = 'hour-marker';
+        hourMarker.textContent = `${i}:00`;
+        hourMarker.setAttribute('data-hour', i);
+        
+        hourMarker.addEventListener('click', function() {
+            // Remove active class from all markers
+            document.querySelectorAll('.hour-marker').forEach(marker => 
+                marker.classList.remove('active'));
+            
+            // Add active class to clicked marker
+            this.classList.add('active');
+            
+            // Get current category and filter images
+            const currentCategory = document.querySelector('.category-item.active')?.getAttribute('data-category');
+            if (currentCategory) {
+                displayCategoryImages(currentCategory, parseInt(this.getAttribute('data-hour')));
+            }
+        });
+        
+        timeHeader.appendChild(hourMarker);
+    }
+    
+    // Insert timeline after header
+    const header = document.querySelector('.header');
+    header.parentNode.insertBefore(timeHeader, header.nextSibling);
+}
+
+// Update category click handler
+
+
+// Add this to your existing DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    setupGallery();
+    createTimeline();
+
+    // Nascondi la timeline all'avvio
+    const timeline = document.getElementById('timeline_bar');
+    if (timeline) timeline.style.display = 'none';
+
+    // Bottone toggle
+    document.getElementById('toggle-timeline').addEventListener('click', function() {
+        const timeline = document.getElementById('timeline_bar');
+        if (timeline) {
+            timeline.style.display = (timeline.style.display === 'none' ? 'flex' : 'none');
+        }
+    });
+
+    // Calcola il totale immagini
+    let totale = 0;
+    document.querySelectorAll('.count-number').forEach(span => {
+        totale += parseInt(span.textContent, 10);
+    });
+    document.getElementById('totale-immagini').textContent = `totale immagini: ${totale}`;
+
+    // --- SPOSTA QUI I LISTENER DELLA LIGHTBOX ---
+    document.getElementById('close-lightbox').onclick = function(e) {
+        e.stopPropagation();
+        document.getElementById('lightbox').classList.remove('active');
+    };
+    document.getElementById('lightbox').onclick = function(e) {
+        if (e.target === this) this.classList.remove('active');
+    };
+
+    // Ordina le categorie in ordine decrescente, ma "altro" resta ultima
+    const container = document.getElementById('container_animals');
+    const items = Array.from(container.querySelectorAll('.category-item'));
+
+    const altro = items.find(item => item.getAttribute('data-category') === 'altro');
+    const rest = items.filter(item => item.getAttribute('data-category') !== 'altro');
+
+    rest.sort((a, b) => {
+        const countA = parseInt(a.querySelector('.count-number').textContent, 10);
+        const countB = parseInt(b.querySelector('.count-number').textContent, 10);
+        return countB - countA;
+    });
+
+    // Rimuovi tutti e riaggiungi in ordine, "altro" sempre ultimo
+    [...rest, altro].forEach(item => container.appendChild(item));
+});
+function displayCategoryImages(category, selectedHour = null) {
+    const existingGallery = document.querySelector('.gallery-overlay');
+    if (existingGallery) {
+        existingGallery.remove();
+    }
+
+    const galleryOverlay = document.createElement('div');
+    galleryOverlay.className = 'gallery-overlay';
+
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+
+    if (selectedHour === null) {
+        // Mostra tutte le immagini della categoria (sequenziale)
+        const categoryElement = document.querySelector(`[data-category="${category}"] .count-number`);
+        const imageCount = parseInt(categoryElement.textContent);
+
+        for (let i = 0; i < imageCount; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'gallery-image-wrapper';
+
+            const imgElement = document.createElement('img');
+            imgElement.src = `images/${category}/IMG_${i}.jpeg`;
+            imgElement.className = 'gallery-image';
+
+            imgElement.addEventListener('click', () => {
+                openLightbox(imgElement.src, category);
+            });
+
+            wrapper.appendChild(imgElement);
+            grid.appendChild(wrapper);
+        }
+        galleryOverlay.appendChild(grid);
+        document.querySelector('#main').appendChild(galleryOverlay);
+    } else {
+        // Mostra solo le immagini di quell'ora usando il JSON
+        fetch('all.json')
+            .then(response => response.json())
+            .then(data => {
+                const categoryData = data[categoryMapping[category]] || [];
+                const filteredImages = categoryData.filter(img => {
+                    let hour = null;
+                    if (img.hour !== undefined) {
+                        hour = parseInt(img.hour);
+                    } else if (img["EXIF/CreateDate"]) {
+                        hour = getHourFromExif(img["EXIF/CreateDate"]);
+                    }
+                    return hour === selectedHour;
+                });
+
+                filteredImages.forEach(img => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'gallery-image-wrapper';
+
+                    const imgElement = document.createElement('img');
+                    imgElement.src = `images/${category}/${img.filename || img.FileName}.jpeg`;
+                    imgElement.className = 'gallery-image';
+
+                    const hour = img.hour !== undefined ? img.hour : getHourFromExif(img["EXIF/CreateDate"]);
+                    imgElement.setAttribute('data-hour', hour);
+
+                    imgElement.addEventListener('click', () => {
+                        openLightbox(imgElement.src, category);
+                    });
+
+                    wrapper.appendChild(imgElement);
+                    grid.appendChild(wrapper);
+                });
+
+                // Mostra il conteggio solo DOPO le immagini
+                const countDiv = document.createElement('div');
+                countDiv.className = 'total-count';
+                countDiv.textContent = `${filteredImages.length} foto scattate alle ${selectedHour}:00`;
+                galleryOverlay.appendChild(grid);
+                galleryOverlay.appendChild(countDiv);
+
+                document.querySelector('#main').appendChild(galleryOverlay);
+            });
+    }
+}
+
+// Aggiunto per il caricamento dei dati dal file JSON
+const data = require('./tuofile.json');
+for (const categoria in data) {
+  const foto = data[categoria];
+  console.log(`Categoria: ${categoria}, Numero foto: ${foto.length}`);
+}
+
+function getHourFromExif(dateString) {
+    if (!dateString) return null;
+    const match = dateString.match(/T?(\d{2}):\d{2}:\d{2}/);
+    return match ? parseInt(match[1]) : null;
+}
+
+function openLightbox(src) {
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-image');
+    img.src = src;
+    lightbox.classList.add('active');
+}
+document.getElementById('close-lightbox').onclick = function(e) {
+    e.stopPropagation(); // Impedisce la propagazione del click al lightbox
+    document.getElementById('lightbox').classList.remove('active');
+};
+document.getElementById('lightbox').onclick = function(e) {
+    if (e.target === this) this.classList.remove('active');
+};
+
+let lightboxImages = [];
+let currentLightboxIndex = 0;
+
+    </script>
+<style>
+/* Nuovo CSS per "Altro" */
+.category-item[data-category="altro"] .category-title,
+.category-item[data-category="altro"] .count-number {
+    color: #888 !important; /* stesso grigio di "tutte le immagini" */
+}
+</style>
+
+
+<!-- Lightbox overlay -->
+<div id="lightbox" class="lightbox">
+    <span class="close-lightbox" id="close-lightbox">&times;</span>
+    <img id="lightbox-image" class="lightbox-image" src="" alt="Immagine grande">
+</div>
+
+</body>
+
+</html>
